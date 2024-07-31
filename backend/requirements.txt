@@ -1,2 +1,6 @@
-fastapi==0.95.2
-uvicorn==0.22.0
+fastapi
+uvicorn
+langchain
+langchain-openai
+langchain-nvidia-ai-endpoints
+langchain-groq
