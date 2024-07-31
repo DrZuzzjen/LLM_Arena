@@ -21,7 +21,15 @@ def app():
         nvidia_model = st.selectbox("NVIDIA Model", NVIDIA_MODELS)
         groq_model = st.selectbox("Groq Model", GROQ_MODELS)
 
-    async def stream_response(provider, model, query, response_placeholder, metrics_placeholder):
+    # Create placeholders for each LLM
+    placeholders = {}
+    for provider in ["OpenAI", "NVIDIA", "Groq"]:
+        placeholders[provider] = st.empty()
+
+    # Create placeholders for charts
+    charts_placeholder = st.empty()
+
+    async def stream_response(provider, model, query, placeholder):
         url = f"{BACKEND_URL}/stream/{provider.lower()}?query={query}&model={model}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
@@ -42,20 +50,17 @@ def app():
                                 full_response += data
                                 metrics["word_count"] = len(full_response.split())
                         
-                        response_placeholder.markdown(f"**{provider} Response:**\n{full_response}")
                         metrics["time"] = asyncio.get_event_loop().time() - start_time
-                        llm_card(provider, model, full_response, metrics)
+                        placeholder.empty()
+                        with placeholder.container():
+                            llm_card(provider, model, full_response, metrics)
         
         return metrics
 
     async def run_comparison(query, models):
         tasks = []
-        placeholders = {}
         for provider, model in models.items():
-            response_placeholder = st.empty()
-            metrics_placeholder = st.empty()
-            placeholders[provider] = (response_placeholder, metrics_placeholder)
-            tasks.append(stream_response(provider, model, query, response_placeholder, metrics_placeholder))
+            tasks.append(stream_response(provider, model, query, placeholders[provider]))
         
         results = await asyncio.gather(*tasks)
         return dict(zip(models.keys(), results))
@@ -73,10 +78,11 @@ def app():
             results = asyncio.run(run_comparison(query, models))
             
             # Display comparison charts
-            st.subheader("Comparison Charts")
-            token_usage_chart(results)
-            time_comparison_chart(results)
-            overall_performance_chart(results)
+            with charts_placeholder.container():
+                st.subheader("Comparison Charts")
+                token_usage_chart(results)
+                time_comparison_chart(results)
+                overall_performance_chart(results)
             
         else:
             st.warning("Please enter a query.")
