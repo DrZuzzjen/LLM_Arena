@@ -1,10 +1,13 @@
 import streamlit as st
 import uuid
 
-def llm_card(provider: str, model: str, response: str, metrics: dict):
-    st.markdown(f"""
-    <div class="llm-card">
-        <h4>{provider} - {model}</h4>
+def llm_card(provider: str, model: str, response: str, metrics: dict, finish_order: int = None):
+    order_class = f"finish-order-{finish_order}" if finish_order is not None else ""
+    order_icon = ["🥇", "🥈", "🥉"][finish_order - 1] if finish_order is not None and finish_order <= 3 else ""
+    
+    card_html = f"""
+    <div class="llm-card {order_class}" id="{provider}-card">
+        <h4>{provider} - {model} {order_icon}</h4>
         <p class="truncate-response">{' '.join(response.split()[:20])}...</p>
         <div class="metrics-grid">
             <div class="metric">
@@ -25,10 +28,8 @@ def llm_card(provider: str, model: str, response: str, metrics: dict):
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
-
-    if st.button(f"Show full response for {provider}", key=f"{provider}_show_more_{uuid.uuid4().hex}"):
-        st.markdown(f"**Full Response:**\n{response}")
+    """
+    return card_html
 
 def load_custom_css():
     st.markdown("""
@@ -38,6 +39,7 @@ def load_custom_css():
         border-radius: 5px;
         padding: 10px;
         margin-bottom: 10px;
+        transition: all 0.5s ease;
     }
     .llm-card h4 {
         margin-top: 0;
@@ -59,6 +61,18 @@ def load_custom_css():
     }
     .metric-label {
         font-weight: bold;
+    }
+    .finish-order-1 {
+        background-color: #90EE90;
+        transform: scale(1.05);
+    }
+    .finish-order-2 {
+        background-color: #FFFFE0;
+        transform: scale(1.03);
+    }
+    .finish-order-3 {
+        background-color: #FFB6C1;
+        transform: scale(1.01);
     }
     </style>
     """, unsafe_allow_html=True)

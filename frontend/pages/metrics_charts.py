@@ -11,7 +11,7 @@ def app():
     load_custom_css()
     st.title("Enhanced LLM Comparison with Metrics & Charts")
 
-    query = st.text_area("Enter your query:", height=100, placeholder="Try asking a question or providing some context.", value="whats heavier, a pound of feathers or a pound of bricks?")
+    query = st.text_area("Enter your query:", height=100, placeholder="Try asking a question or providing some context.", value="whats heavier, 100kg of feathers or 100kg of steel?")
 
     col1, col2, col3 = st.columns(3)
     
@@ -36,19 +36,11 @@ def app():
             charts_placeholder = st.empty()
 
             # Run comparison asynchronously
-            async def run_comparison():
-                models = {
-                    "OpenAI": openai_model,
-                    "NVIDIA": nvidia_model,
-                    "Groq": groq_model
-                }
-                tasks = [stream_response(provider, model, query, llm_placeholders[provider]) 
-                        for provider, model in models.items()]
-                results = await asyncio.gather(*tasks)
-                return dict(zip(models.keys(), results))
-
-            # Use asyncio to run the comparison
-            results = asyncio.run(run_comparison())
+            results = asyncio.run(run_comparison(query, {
+                "OpenAI": openai_model,
+                "NVIDIA": nvidia_model,
+                "Groq": groq_model
+            }, llm_placeholders))
 
             # Display comparison charts
             with charts_placeholder.container():
@@ -63,19 +55,26 @@ def app():
         else:
             st.warning("Please enter a query.")
 
-async def stream_response(provider, model, query, placeholder):
+async def stream_response(provider, model, query, placeholder, finish_order_queue):
     url = f"{BACKEND_URL}/stream/{provider.lower()}?query={query}&model={model}"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             start_time = asyncio.get_event_loop().time()
             full_response = ""
             metrics = {"time": 0, "total_tokens": 0, "prompt_tokens": 0, "completion_tokens": 0, "cost": 0, "word_count": 0}
+            finish_order = None
+            
+            # Initial card render
+            placeholder.markdown(llm_card(provider, model, full_response, metrics), unsafe_allow_html=True)
+            
             async for line in response.content:
                 if line:
                     decoded_line = line.decode('utf-8').strip()
                     if decoded_line.startswith("data: "):
                         data = decoded_line[6:]
                         if data == "[DONE]":
+                            if finish_order is None:
+                                finish_order = await finish_order_queue.get()
                             break
                         if data.startswith("{"):  # Metrics update
                             new_metrics = eval(data)  # Be cautious with eval in production!
@@ -85,13 +84,18 @@ async def stream_response(provider, model, query, placeholder):
                             metrics["word_count"] = len(full_response.split())
 
                     metrics["time"] = asyncio.get_event_loop().time() - start_time
-                    placeholder.empty()
-                    with placeholder.container():
-                        llm_card(provider, model, full_response, metrics)
+                    placeholder.markdown(llm_card(provider, model, full_response, metrics, finish_order), unsafe_allow_html=True)
 
-    return {"response": full_response, "metrics": metrics}
+    # Final update with finish order
+    placeholder.markdown(llm_card(provider, model, full_response, metrics, finish_order), unsafe_allow_html=True)
+    return {"response": full_response, "metrics": metrics, "finish_order": finish_order}
 
-async def run_comparison(query, models):
-    tasks = [stream_response(provider, model, query) for provider, model in models.items()]
+async def run_comparison(query, models, llm_placeholders):
+    finish_order_queue = asyncio.Queue()
+    for i in range(1, len(models) + 1):
+        await finish_order_queue.put(i)
+
+    tasks = [stream_response(provider, model, query, llm_placeholders[provider], finish_order_queue) 
+             for provider, model in models.items()]
     results = await asyncio.gather(*tasks)
     return dict(zip(models.keys(), results))
