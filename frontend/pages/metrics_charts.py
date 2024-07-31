@@ -11,7 +11,7 @@ def app():
     load_custom_css()
     st.title("Enhanced LLM Comparison with Metrics & Charts")
 
-    query = st.text_area("Enter your query:", height=100)
+    query = st.text_area("Enter your query:", height=100, placeholder="Try asking a question or providing some context.", value="whats heavier, a pound of feathers or a pound of bricks?")
 
     col1, col2, col3 = st.columns(3)
     
@@ -49,14 +49,6 @@ def app():
 
             # Use asyncio to run the comparison
             results = asyncio.run(run_comparison())
-
-            # Display LLM cards side-by-side
-            with col1:
-                llm_card("OpenAI", openai_model, results["OpenAI"]["response"], results["OpenAI"]["metrics"])
-            with col2:
-                llm_card("NVIDIA", nvidia_model, results["NVIDIA"]["response"], results["NVIDIA"]["metrics"])
-            with col3:
-                llm_card("Groq", groq_model, results["Groq"]["response"], results["Groq"]["metrics"])
 
             # Display comparison charts
             with charts_placeholder.container():
