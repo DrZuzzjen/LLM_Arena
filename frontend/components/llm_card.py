@@ -8,7 +8,7 @@ def llm_card(provider: str, model: str, response: str, metrics: dict, finish_ord
     card_html = f"""
     <div class="llm-card {order_class}" id="{provider}-card">
         <h4>{provider} - {model} {order_icon}</h4>
-        <p class="truncate-response">{' '.join(response.split()[:20])}...</p>
+        <p class="truncate-response">{' '.join(response.split()[:50])}...</p>
         <div class="metrics-grid">
             <div class="metric">
                 <span class="metric-label">Time:</span>
@@ -46,9 +46,9 @@ def load_custom_css():
         margin-bottom: 5px;
     }
     .truncate-response {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: normal;  /* Allow wrapping */
+        overflow: visible;    /* Remove overflow */
+        text-overflow: clip;  /* Remove text-overflow */
     }
     .metrics-grid {
         display: grid;
@@ -65,6 +65,8 @@ def load_custom_css():
     .finish-order-1 {
         background-color: #90EE90;
         transform: scale(1.05);
+        border: 2px solid #006400; /* Dark green border to make it bold */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adding shadow */
     }
     .finish-order-2 {
         background-color: #FFFFE0;

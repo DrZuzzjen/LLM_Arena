@@ -20,14 +20,19 @@ LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2")
 
 OPENAI_MODELS = [
     "gpt-4o",
-    "gpt-3.5-turbo",
+    "gpt-4o-mini",
+    "gpt-3.5-turbo-instruct",
     "gpt-4",
     "gpt-4-turbo",
 ]
 
 NVIDIA_MODELS = [
     "meta/llama-3.1-8b-instruct",
+    "mistralai/mixtral-8x22b-instruct-v0.1",
     "meta/llama-3.1-405b-instruct",
+    "nv-mistralai/mistral-nemo-12b-instruct",
+    "google/gemma-2-9b-it",
+    "microsoft/phi-3-medium-128k-instruct"
 ]
 
 GROQ_MODELS = [
@@ -35,4 +40,7 @@ GROQ_MODELS = [
       "llama-3.1-70b-versatile",
       "llama3-groq-70b-8192-tool-use-preview",
       "llama-3.1-405b-reasoning",
+      "gemma2-9b-it",
+      "gemma-7b-it",
+      "mixtral-8x7b-32768"
     ]
