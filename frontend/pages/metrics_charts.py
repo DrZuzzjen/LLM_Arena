@@ -1,11 +1,26 @@
 import streamlit as st
 import asyncio
 import aiohttp
+import plotly.graph_objects as go  # Add this line
 from config.settings import OPENAI_MODELS, NVIDIA_MODELS, GROQ_MODELS
 from components.llm_card import llm_card, load_custom_css
 from components.comparison_charts import token_usage_chart, time_comparison_chart, overall_performance_chart
 
 BACKEND_URL = st.secrets.get("BACKEND_URL", "http://backend:8000")
+
+def words_per_second_chart(results):
+    fig = go.Figure(data=[
+        go.Bar(
+            x=list(results.keys()),
+            y=[r['metrics']['word_count'] / r['metrics']['time'] for r in results.values()]
+        )
+    ])
+    fig.update_layout(
+        title='Words Per Second Comparison',
+        yaxis_title='Words/Second',
+        height=300
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 def app():
     load_custom_css()
@@ -51,6 +66,7 @@ def app():
                     overall_performance_chart(results)
                 with col2:
                     time_comparison_chart(results)
+                    words_per_second_chart(results)  
 
         else:
             st.warning("Please enter a query.")
@@ -61,7 +77,15 @@ async def stream_response(provider, model, query, placeholder, finish_order_queu
         async with session.get(url) as response:
             start_time = asyncio.get_event_loop().time()
             full_response = ""
-            metrics = {"time": 0, "total_tokens": 0, "prompt_tokens": 0, "completion_tokens": 0, "cost": 0, "word_count": 0}
+            metrics = {
+                "time": 0,
+                "total_tokens": 0,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "cost": 0,
+                "word_count": 0,
+                "words_per_second": 0  # New metric
+            }
             finish_order = None
             
             # Initial card render
@@ -83,11 +107,21 @@ async def stream_response(provider, model, query, placeholder, finish_order_queu
                             full_response += data
                             metrics["word_count"] = len(full_response.split())
 
-                    metrics["time"] = asyncio.get_event_loop().time() - start_time
+                    elapsed_time = asyncio.get_event_loop().time() - start_time
+                    metrics["time"] = elapsed_time
+                    
+                    # Calculate words per second
+                    if elapsed_time > 0:
+                        metrics["words_per_second"] = metrics["word_count"] / elapsed_time
+                    
                     placeholder.markdown(llm_card(provider, model, full_response, metrics, finish_order), unsafe_allow_html=True)
 
     # Final update with finish order
+    final_time = asyncio.get_event_loop().time() - start_time
+    metrics["time"] = final_time
+    metrics["words_per_second"] = metrics["word_count"] / final_time if final_time > 0 else 0
     placeholder.markdown(llm_card(provider, model, full_response, metrics, finish_order), unsafe_allow_html=True)
+    
     return {"response": full_response, "metrics": metrics, "finish_order": finish_order}
 
 async def run_comparison(query, models, llm_placeholders):

@@ -33,3 +33,17 @@ def overall_performance_chart(results):
         height=300
     )
     st.plotly_chart(fig, use_container_width=True)
+
+def words_per_second_chart(results):
+    fig = go.Figure(data=[
+        go.Bar(
+            x=list(results.keys()),
+            y=[r['metrics']['word_count'] / r['metrics']['time'] for r in results.values()]
+        )
+    ])
+    fig.update_layout(
+        title='Words Per Second Comparison',
+        yaxis_title='Words/Second',
+        height=300
+    )
+    st.plotly_chart(fig, use_container_width=True)

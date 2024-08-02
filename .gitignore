@@ -1,5 +1,7 @@
 # Environment variables
 .env
+*pem
+
 
 
 # Python
@@ -12,6 +14,8 @@ env/
 venv/
 pip-log.txt
 pip-delete-this-directory.txt
+backend/*.txt
+frontend/*.txt
 
 # Docker
 .docker/
