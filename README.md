@@ -10,7 +10,8 @@ Welcome to **LLM Arena**! This is where the heavyweights of language models go h
 
 This is a solution to question I had while implementing an agentic solution, I was thinking all the possible ways to make it run faster. I came up with this app just to illustrate the concept of how usefull coluld it be to choose the right models and providers.
 
-<video src="demo.mp4" controls></video>
+[Ver demo en video](demo.mp4)
+[![Demo](demo.png)](demo.mp4)
 
 ## 🚀 Features
 
@@ -23,7 +24,7 @@ This is a solution to question I had while implementing an agentic solution, I w
 - **Backend**: Python + FastAPI + Langchain
 
   <img src="https://www.simplilearn.com/ice9/free_resources_article_thumb/FastAPI_b.jpg" alt="Groq Logo" width="100" height="50">
-  <img src="  https://miro.medium.com/v2/resize:fit:1200/1*-PlFCd_VBcALKReO3ZaOEg.png" alt="Groq Logo" width="100" height="50">
+  <img src="https://miro.medium.com/v2/resize:fit:1200/1*-PlFCd_VBcALKReO3ZaOEg.png" alt="Groq Logo" width="100" height="50">
 
   The backend is powered by FastAPI and is fully asynchronous, ensuring fast response times and real-time streaming for all the models.
 
