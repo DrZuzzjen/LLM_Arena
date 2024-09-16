@@ -10,8 +10,7 @@ Welcome to **LLM Arena**! This is where the heavyweights of language models go h
 
 This is a solution to question I had while implementing an agentic solution, I was thinking all the possible ways to make it run faster. I came up with this app just to illustrate the concept of how usefull coluld it be to choose the right models and providers.
 
-[Ver demo en video](demo.mp4)
-[![Demo](demo.png)](demo.mp4)
+  <img src="demo.gif" alt="Groq Logo" width="550">
 
 ## 🚀 Features
 
