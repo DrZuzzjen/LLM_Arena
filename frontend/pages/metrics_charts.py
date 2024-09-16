@@ -2,24 +2,63 @@ import streamlit as st
 import asyncio
 import aiohttp
 import plotly.graph_objects as go  # Add this line
+
+from plotly.subplots import make_subplots
 from config.settings import OPENAI_MODELS, NVIDIA_MODELS, GROQ_MODELS
 from components.llm_card import llm_card, load_custom_css
 from components.comparison_charts import token_usage_chart, time_comparison_chart, overall_performance_chart
 
 BACKEND_URL = st.secrets.get("BACKEND_URL", "http://backend:8000")
 
-def words_per_second_chart(results):
-    fig = go.Figure(data=[
-        go.Bar(
-            x=list(results.keys()),
-            y=[r['metrics']['word_count'] / r['metrics']['time'] for r in results.values()]
-        )
-    ])
+def create_comparison_chart(results, metric, title, xaxis_title):
+    colors = {
+        "OpenAI": "#90EE90",  # Light green
+        "NVIDIA": "#FFFFE0",  # Light yellow
+        "Groq": "#FFB6C1"     # Light pink
+    }
+    
+    fig = go.Figure()
+    
+    for provider, data in results.items():
+        fig.add_trace(go.Bar(
+            y=[provider],
+            x=[data['metrics'][metric]],
+            name=provider,
+            orientation='h',
+            marker_color=colors[provider],
+            text=[f"{data['metrics'][metric]:.2f}"],
+            textposition='outside',
+            hoverinfo='text',
+            hovertext=f"{provider}: {data['metrics'][metric]:.2f}",
+            textfont=dict(size=14),
+            marker=dict(line=dict(width=2, color='#000000'))
+        ))
+
     fig.update_layout(
-        title='Words Per Second Comparison',
-        yaxis_title='Words/Second',
-        height=300
+        title=dict(
+            text=title,
+            font=dict(size=20, color='#333333'),
+            x=0.5,
+            y=0.95
+        ),
+        xaxis=dict(title=xaxis_title, tickfont=dict(size=12)),
+        yaxis=dict(title='', tickfont=dict(size=14)),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        plot_bgcolor='rgba(240, 240, 240, 0.5)',
+        height=300,
+        width=500,
+        margin=dict(l=150, r=50, t=80, b=50),
+        bargap=0.3
     )
+    
+    return fig
+
+def words_per_second_chart(results):
+    fig = create_comparison_chart(results, 'words_per_second', 'Words Per Second Comparison', 'Words/Second')
+    st.plotly_chart(fig, use_container_width=True)
+
+def time_comparison_chart(results):
+    fig = create_comparison_chart(results, 'time', 'Response Time Comparison', 'Time (seconds)')
     st.plotly_chart(fig, use_container_width=True)
 
 def app():
@@ -59,14 +98,16 @@ def app():
 
             # Display comparison charts
             with charts_placeholder.container():
-                st.subheader("Comparison Charts")
-                col1, col2 = st.columns([2, 1])
+                st.subheader("Performance Comparisons")
+                col1, col2 = st.columns(2)
                 with col1:
-                    token_usage_chart(results)
-                    overall_performance_chart(results)
-                with col2:
                     time_comparison_chart(results)
-                    words_per_second_chart(results)  
+                with col2:
+                    words_per_second_chart(results)
+                
+                # Keep the other charts as they are
+                token_usage_chart(results)
+                overall_performance_chart(results)
 
         else:
             st.warning("Please enter a query.")
