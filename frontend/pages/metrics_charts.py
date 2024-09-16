@@ -10,13 +10,18 @@ from components.comparison_charts import token_usage_chart, time_comparison_char
 
 BACKEND_URL = st.secrets.get("BACKEND_URL", "http://backend:8000")
 
-def create_comparison_chart(results, metric, title, xaxis_title):
+def assign_colors(results, metric, reverse=False):
+    sorted_providers = sorted(results.keys(), key=lambda k: results[k]['metrics'][metric], reverse=reverse)
     colors = {
-        "OpenAI": "#90EE90",  # Light green
-        "NVIDIA": "#FFFFE0",  # Light yellow
-        "Groq": "#FFB6C1"     # Light pink
+        sorted_providers[0]: "#90EE90",  # Green for best performer
+        sorted_providers[1]: "#FFFFE0",  # Yellow for middle performer
+        sorted_providers[2]: "#FFB6C1"   # Pink for worst performer
     }
-    
+    return colors
+
+
+def create_comparison_chart(results, metric, title, xaxis_title, reverse_sort=False):
+    colors = assign_colors(results, metric, reverse_sort)
     fig = go.Figure()
     
     for provider, data in results.items():
@@ -54,7 +59,7 @@ def create_comparison_chart(results, metric, title, xaxis_title):
     return fig
 
 def words_per_second_chart(results):
-    fig = create_comparison_chart(results, 'words_per_second', 'Words Per Second Comparison', 'Words/Second')
+    fig = create_comparison_chart(results, 'words_per_second', 'Words Per Second Comparison', 'Words/Second', reverse_sort=True)
     st.plotly_chart(fig, use_container_width=True)
 
 def time_comparison_chart(results):
