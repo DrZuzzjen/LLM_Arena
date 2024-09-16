@@ -7,6 +7,7 @@ from plotly.subplots import make_subplots
 from config.settings import OPENAI_MODELS, NVIDIA_MODELS, GROQ_MODELS
 from components.llm_card import llm_card, load_custom_css
 from components.comparison_charts import token_usage_chart, time_comparison_chart, overall_performance_chart
+from components.modal import create_modal
 
 BACKEND_URL = st.secrets.get("BACKEND_URL", "http://backend:8000")
 
@@ -110,9 +111,36 @@ def app():
                 with col2:
                     words_per_second_chart(results)
                 
-                # Keep the other charts as they are
-                token_usage_chart(results)
-                overall_performance_chart(results)
+                #Hidding Token charts until metric is solved
+                #token_usage_chart(results) 
+                #overall_performance_chart(results)
+            
+            # Display full responses and metrics using expanders
+            st.subheader("Full Responses and Detailed Metrics")
+
+            # Define emojis for each metric
+            emoji_time = "⏱️"
+            emoji_word_count = "📝"
+            emoji_words_per_second = "⚡"
+
+            for provider, data in results.items():
+                with st.expander(f"{provider} - {data['model']} (Click to expand)"):
+                    st.markdown("### Full Response:")
+                    st.write(data['response'])
+                    
+                    st.markdown("### Detailed Metrics:")
+                    
+                    # Use columns to display metrics side by side
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"{emoji_time} Time: {data['metrics']['time']:.2f}s")
+                    
+                    with col2:
+                        st.write(f"{emoji_word_count} Word Count: {data['metrics']['word_count']}")
+                    
+                    with col3:
+                        st.write(f"{emoji_words_per_second} Words/Second: {data['metrics']['words_per_second']:.2f}")
 
         else:
             st.warning("Please enter a query.")
@@ -168,7 +196,7 @@ async def stream_response(provider, model, query, placeholder, finish_order_queu
     metrics["words_per_second"] = metrics["word_count"] / final_time if final_time > 0 else 0
     placeholder.markdown(llm_card(provider, model, full_response, metrics, finish_order), unsafe_allow_html=True)
     
-    return {"response": full_response, "metrics": metrics, "finish_order": finish_order}
+    return {"response": full_response, "metrics": metrics, "finish_order": finish_order,"model": model}
 
 async def run_comparison(query, models, llm_placeholders):
     finish_order_queue = asyncio.Queue()

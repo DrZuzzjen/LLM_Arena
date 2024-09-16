@@ -15,6 +15,14 @@ def llm_card(provider: str, model: str, response: str, metrics: dict, finish_ord
                 <span class="metric-value">{metrics['time']:.2f}s</span>
             </div>
             <div class="metric">
+                <span class="metric-label">Cost:</span>
+                <span class="metric-value">${metrics['cost']:.6f}</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Tokens:</span>
+                <span class="metric-value">{metrics['total_tokens']}</span>
+            </div>
+            <div class="metric">
                 <span class="metric-label">Words:</span>
                 <span class="metric-value">{metrics['word_count']}</span>
             </div>
