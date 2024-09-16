@@ -2,11 +2,11 @@
 
 <img src="demo.png" width=750>
 
-Welcome to **LLM Arena**! This is where the heavyweights of language models go head-to-head: OpenAI, NVIDIA, and Groq. Our goal? To find out which model and provider is the fastest and most efficient in terms of both speed and the number of words generated.
+Welcome to **LLM Arena**! This is where the heavyweights of language models go head-to-head: **OpenAI**, **NVIDIA**, and **Groq**. The goal? To find out which model and provider is the fastest and most efficient in terms of both speed and the number of words generated.
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/OpenAI_Logo.svg/512px-OpenAI_Logo.svg.png" alt="OpenAI Logo" width="100" height="50"> <img src="https://www.nvidia.com/content/dam/en-zz/Solutions/about-nvidia/logo-and-brand/01-nvidia-logo-vert-500x200-2c50-d.png" alt="NVIDIA Logo" width="100" height="50"> <img src="https://raw.githubusercontent.com/RMNCLDYO/groq-ai-toolkit/main/.github/groq-logo.png" alt="Groq Logo" width="100" height="50">
 
-## Why LLM Arena? 🤔
+## Why ? 🤔
 
 This is a solution to question I had while implementing an agentic solution, I was thinking all the possible ways to make it run faster. I came up with this app just to illustrate the concept of how usefull coluld it be to choose the right models and providers.
 
@@ -14,12 +14,9 @@ This is a solution to question I had while implementing an agentic solution, I w
 
 ## 🚀 Features
 
-- **Compare** the speed and word count across OpenAI, NVIDIA, and Groq language models.
-- **Streaming** responses in real-time using an **async** backend for ultimate performance.
-
-## 🎯Upcoming Features
-
-- **📊 Tokens & Cost Metrics**: Compare models not just by speed, but by how much they cost per token too! 💸
+- 📊 **Metrics & Charts** Allows you to measure the speed and word count across OpenAI, NVIDIA, and Groq language models API's and compare their performance.
+- 📝 **Text Response**: same as before, but focusing on the text output quality.
+- 🚥 **Streaming** async responses in real-time backend.
 
 ## Tech Stack 🛠️
 
@@ -46,7 +43,7 @@ This is a solution to question I had while implementing an agentic solution, I w
 ## Requirements 📦
 
 - Docker & Docker Compose installed
-- API keys for **OpenAI**, **Nvidia**, and **Groq**
+- API keys for [**OpenAI**](https://platform.openai.com/), [**Nvidia**](https://build.nvidia.com/), and [**Groq**](https://console.groq.com/)
 
 ## Installation 🔧
 
@@ -111,11 +108,15 @@ We can't wait to see what you'll bring to the project! 🙌
 
 If you have any questions, feel free to reach out:
 
-- **[Twitter](https://x.com/Farmacod)**
 - **[LinkedIn](https://www.linkedin.com/in/gutierrezfrancois/)**
 - **[GitHub](https://github.com/DrZuzzjen)**
+- **[Twitter](https://x.com/Farmacod)**
 
 ---
+
+## 🎯Upcoming Features
+
+- **📊 Tokens & Cost Metrics**: Compare models not just by speed, but by how much they cost per token too! 💸
 
 Happy coding and may the best LLM win! ⚡
 """
