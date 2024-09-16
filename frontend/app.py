@@ -17,7 +17,7 @@ st.markdown("""
 # Crear un diccionario de páginas
 PAGES = {
     "Metrics & Charts": metrics_charts,
-    "Basic Comparison": basic_comparison
+    "Text Response": basic_comparison
 }
 
 # Barra lateral para navegación
