@@ -69,7 +69,7 @@ def time_comparison_chart(results):
 
 def app():
     load_custom_css()
-    st.title("Enhanced LLM Comparison with Metrics & Charts")
+    st.title("⏱️ LLM Arena")
 
     query = st.text_area("Enter your query:", height=100, placeholder="Try asking a question or providing some context.", value="whats heavier, 100kg of feathers or 100kg of steel?")
 
